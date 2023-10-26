@@ -1,37 +1,56 @@
+let noiseTime = 0;
+let noiseTam = 100;
+
 let osc, playing, freq, amp;
 
 function setup() {
-  let cnv = createCanvas(100, 100);
-  cnv.mousePressed(playOscillator);
-  osc = new p5.Oscillator('sine');
+  createCanvas(windowWidth, windowHeight);
+  background(10, 35, 70);
+  smooth(50);
+
+  osc = new p5.Oscillator('triangle');
 }
 
 function draw() {
-  background(220)
-  freq = constrain(map(mouseX, 0, width, 100, 500), 100, 500);
-  amp = constrain(map(mouseY, height, 0, 0, 1), 0, 1);
 
-  text('tap to play', 20, 20);
-  text('freq: ' + freq, 20, 40);
-  text('amp: ' + amp, 20, 60);
+  let posX1 = map(noise(noiseTime), 0, 1, 0, windowWidth);
+  let posY1 = map(noise(noiseTam), 0, 1, 0, windowHeight);
+  let posX2 = map(noise(noiseTime + 0.1), 0, 1, 0, windowWidth);
+  let posY2 = map(noise(noiseTam + 0.1), 0, 1, 0, windowHeight);
 
-  if (playing) {
-    // smooth the transitions by 0.1 seconds
-    osc.freq(freq, 0.1);
-    osc.amp(amp, 0.1);
-  }
-}
+  let tam = map(noise(noiseTime), 0, 1, 50, 5);
+  noiseTime += 0.004;
+  noiseTam += 0.011;
 
-function playOscillator() {
-  // starting an oscillator on a user gesture will enable audio
-  // in browsers that have a strict autoplay policy.
-  // See also: userStartAudio();
+  stroke(179, 70, 90, 60);
+  strokeWeight(2);
+  line(posX1, posY1, posX2, posY2);
+
+  let reflY1 = windowHeight - posY1;
+  let reflY2 = windowHeight - posY2;
+  let tamrefl = tam;
+
+  stroke(243, 159, 90, 30);
+  strokeWeight(2);
+  line(posX1, reflY1, posX2, reflY2, tamrefl);
+
+
+  let posX3 = map(noise(noiseTime + 100), 0, 1, 0, windowWidth);
+  let posY3 = map(noise(noiseTam + 50), 0, 1, 0, windowHeight);
+  let tamcir = map(noise(noiseTam + 1), 0, 1, 0, 0,5);
+
+  fill(0, 21, 36);
+  stroke(200, 204, 10, 50);
+  strokeWeight(3);
+  circle(posX3, posY3, tamcir);
+
+
+  ///// Sonido//////
   osc.start();
-  playing = true;
-}
+  freq = constrain(map(posX3 + 50), 0, 1, 0,);
+  amp = 0, 5;
 
-function mouseReleased() {
-  // ramp amplitude to 0 over 0.5 seconds
-  osc.amp(0, 0.5);
-  playing = false;
+  osc.freq(freq, 0.1);
+  osc.amp(amp, 1, posX3);
+  
 }
